@@ -1,29 +1,44 @@
 //读取文件路径下全部文件名称，并保存在vector中
-//#include "dirent.h"
+#include "dirent.h"
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <string.h>
+#include <fstream>
+using namespace std;
+
 
 /*
-  @para: file_stack: 用来保存文件名称的vector
-  		 file_path:  文件夹的路径
+  @para: file_list: 用来保存文件名称的vector
+  		 folder_path:  文件夹的路径
   @return: None
 
 */
-void read_file_path_and_stack(std::vector<std::string> &file_stack,std::string filepath)
+void getFileList(std::vector<std::string> &file_list,std::string folder_path)
 {
-    DIR *file_dir = opendir(filepath.c_str());
-    struct dirent *filename;
-    while((filename=readdir(file_dir))!=NULL)
+    dirent *ptr;
+    DIR *dir;
+    file_list.clear();
+    dir=opendir(folder_path.c_str());
+    std::size_t pos;
+    folder_path.find_last_of("/",pos);
+    if(pos!=(folder_path.size()-1))
+        folder_path.push_back('/');
+    cout<<folder_path<<endl;
+
+    while((ptr=readdir(dir))!=NULL)
     {
-        if(strcmp(filename->d_name,".")==0||strcmp(filename->d_name,"..")==0)
+        if(strcmp(ptr->d_name,".")==0||strcmp(ptr->d_name,"..")==0)
             continue;
         std::stringstream ss;
-        ss<<image_file_path<<filename->d_name;
-        file_stack.push_back(ss.str());
+        ss<<folder_path<<ptr->d_name;
+        file_list.emplace_back(ss.str());
     }
+    closedir(dir);
 }
 
-
 /**
-读取txt文件夹中的数据
+读取txt文件夹中的数据,一行一行的读取
 */
 void SplitString(std::string str,std::vector<std::string> &fields,char separators)
 {
