@@ -14,40 +14,47 @@ using namespace std;
   @return: None
 
 */
-void getFileList(std::vector<std::string> &file_list,std::string folder_path)
-{
-    dirent *ptr;
-    DIR *dir;
-    file_list.clear();
-    dir=opendir(folder_path.c_str());
-    std::size_t pos;
-    folder_path.find_last_of("/",pos);
-    if(pos!=(folder_path.size()-1))
-        folder_path.push_back('/');
-    cout<<folder_path<<endl;
+void getFileList(std::vector<std::string> &file_list, std::string folder_path,
+                 bool concate = true, bool verbose = false) {
+  dirent *ptr;
+  DIR *dir;
+  file_list.clear();
+  dir = opendir(folder_path.c_str());
+  std::size_t pos;
+  folder_path.find_last_of("/", pos);
+  if (pos != (folder_path.size() - 1)) folder_path.push_back('/');
 
-    while((ptr=readdir(dir))!=NULL)
-    {
-        if(strcmp(ptr->d_name,".")==0||strcmp(ptr->d_name,"..")==0)
-            continue;
-        std::stringstream ss;
-        ss<<folder_path<<ptr->d_name;
-        file_list.emplace_back(ss.str());
+  while ((ptr = readdir(dir)) != NULL) {
+    if (strcmp(ptr->d_name, ".") == 0 || strcmp(ptr->d_name, "..") == 0)
+      continue;
+    std::stringstream ss;
+    if (concate)
+      ss << folder_path << ptr->d_name;
+    else {
+      ss << ptr->d_name;
     }
-    closedir(dir);
+    file_list.emplace_back(ss.str());
+    if (verbose) {
+      std::cout << ss.str() << std::endl;
+    }
+  }
+  closedir(dir);
 }
 
 /**
 读取txt文件夹中的数据,一行一行的读取
 */
-void SplitString(std::string str,std::vector<std::string> &fields,char separators)
-{
-    std::istringstream sin(str);
-    std::string field;
-    while(std::getline(sin,field,separators))
-    {
-        fields.push_back(field);
+void SplitString(std::string str, std::vector<std::string> &fields,
+                 char separators, bool verbose = false) {
+  std::istringstream sin(str);
+  std::string field;
+  while (std::getline(sin, field, separators)) {
+    fields.push_back(field);
+    if (verbose) {
+      std::cout << field << "--";
     }
+  }
+  if (verbose) std::cout << std::endl;
 }
 
 void Readtxt(std::string file_path,std::vector<std::string> &fields,char separator) {
